@@ -74,8 +74,22 @@ def get_relationship():
                                         WHERE length(path) >= 1
                                         RETURN path limit 1;
 					''')
-		relation_path = relation_path_query_res.data()[0]['path']
-		return dumps(relation_path)
+		relation_path = relation_path_query_res.single().value()
+
+		get_node_properties = lambda node: {k:v for (k, v) in node.items()}
+
+		response = []
+		for node, relationship in zip(relation_path.nodes, relation_path.relationships):
+			response.append(get_node_properties(node))
+			if relationship.type == 'CHILD':
+				if relationship.start_node == node:
+					response.append('CHILD')
+				else:
+					response.append('PARENT')
+			else:
+				response.append('SPOUSE')
+		response.append(get_node_properties(relation_path.nodes[-1]))
+		return dumps(response)
 
 @app.route('/api/add/family/member', methods=['POST'])
 def add_family_member():
