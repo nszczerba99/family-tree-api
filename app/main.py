@@ -7,7 +7,6 @@ from flask_cors import CORS, cross_origin
 from json import dumps
 
 app = Flask(__name__)
-# app.config['CORS_HEADERS'] = 'Content-Type'
 CORS(app)
 
 uri = os.environ['DATABASE_URI']
@@ -15,7 +14,7 @@ auth = (os.environ['USER'], os.environ['PASSWORD'])
 driver = GraphDatabase.driver(uri, auth=auth)
 
 @app.route('/api/family/members', methods=['GET'])
-@cross_origin()
+# @cross_origin()
 def get_family_memebers():
 	with driver.session() as session:
 		people_query_res = session.run('MATCH (p:Person) RETURN p.id AS id, p.name AS name, p.surname as surname')
@@ -23,7 +22,7 @@ def get_family_memebers():
 		return dumps(people)
 
 @app.route('/api/spouses', methods=['GET'])
-@cross_origin()
+# @cross_origin()
 def get_spouses():
 	with driver.session() as session:
 		spouse_relations_query_res = session.run('MATCH (p1:Person)-[r: SPOUSE]->(p2:Person) RETURN p1, p2')
@@ -31,7 +30,7 @@ def get_spouses():
 		return dumps(spouse_relations)
 
 @app.route('/api/familytree', methods=['GET'])
-@cross_origin()
+# @cross_origin()
 def get_family_tree():
 	with driver.session() as session:
 		def get_tree_for_person(person):
@@ -67,7 +66,7 @@ def get_family_tree():
 		return dumps(response)
 
 @app.route('/api/family/relation', methods=['GET'])
-@cross_origin()
+# @cross_origin()
 def get_relationship():
 	id1 = request.args.get('id1')
 	id2 = request.args.get('id2')
@@ -83,7 +82,7 @@ def get_relationship():
 		return dumps(relation_path)
 
 @app.route('/api/add/family/member', methods=['POST'])
-@cross_origin()
+# @cross_origin()
 def add_family_member():
 	new_member = request.get_json()
 
@@ -96,7 +95,7 @@ def add_family_member():
 		return str(id)
 
 @app.route('/api/add/family/relation', methods=['POST'])
-@cross_origin()
+# @cross_origin()
 def add_family_relation():
 	new_relation = request.get_json()
 
