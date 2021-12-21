@@ -8,6 +8,7 @@ from json import dumps
 
 app = Flask(__name__)
 CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 
 uri = os.environ['DATABASE_URI']
 auth = (os.environ['USER'], os.environ['PASSWORD'])
