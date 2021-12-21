@@ -7,7 +7,7 @@ from flask_cors import CORS, cross_origin
 from json import dumps
 
 app = Flask(__name__)
-app.config['CORS_HEADERS'] = 'Content-Type'
+# app.config['CORS_HEADERS'] = 'Content-Type'
 CORS(app)
 
 uri = os.environ['DATABASE_URI']
