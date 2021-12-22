@@ -2,7 +2,6 @@
 
 import os
 from flask import Flask, request
-from flask.wrappers import Response
 from neo4j import GraphDatabase
 from flask_cors import CORS
 from json import dumps
