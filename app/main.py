@@ -2,6 +2,7 @@
 
 import os
 from flask import Flask, request
+from flask.wrappers import Response
 from neo4j import GraphDatabase
 from flask_cors import CORS
 from json import dumps
@@ -78,17 +79,30 @@ def get_relationship():
 
 		get_node_properties = lambda node: {k:v for (k, v) in node.items()}
 
-		response = []
+		relation_path_arr = []
 		for node, relationship in zip(relation_path.nodes, relation_path.relationships):
-			response.append(get_node_properties(node))
+			relation_path_arr.append(get_node_properties(node))
 			if relationship.type == 'CHILD':
 				if relationship.start_node == node:
-					response.append('CHILD')
+					relation_path_arr.append('CHILD')
 				else:
-					response.append('PARENT')
+					relation_path_arr.append('PARENT')
 			else:
-				response.append('SPOUSE')
-		response.append(get_node_properties(relation_path.nodes[-1]))
+				relation_path_arr.append('SPOUSE')
+		relation_path_arr.append(get_node_properties(relation_path.nodes[-1]))
+
+		siblings_parents_indexes = {index for index in range(2, len(relation_path_arr) - 2) if relation_path_arr[index - 1] == 'PARENT' and relation_path_arr[index + 1] == 'CHILD'}
+
+		response = [relation_path_arr[0]]
+		for index in range(2, len(relation_path_arr), 2):
+			if index in siblings_parents_indexes:
+				response.append('SIBLING')
+			elif index - 2 in siblings_parents_indexes:
+				response.append(relation_path_arr[index])
+			else:
+				response.append(relation_path_arr[index - 1])
+				response.append(relation_path_arr[index])
+
 		return dumps(response)
 
 @app.route('/api/add/family/member', methods=['POST'])
